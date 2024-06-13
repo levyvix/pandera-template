@@ -45,10 +45,21 @@ def test_coluna_em_falta():
     with pytest.raises(pa.errors.SchemaError):
         MetricasFinanceirasBase.validate(df_test)
 
-
 def test_valor_em_falta():
     df_test = pd.DataFrame({
         "setor_da_empresa": [np.nan, "REP_X7Y8Z9", "MNT_4D5E6F"],
+        "receita_operacional": [1000,1000,1000],
+        "data": ["2023-01-01", "2023-01-01", "2023-01-01"],
+        "percentual_de_imposto": [0.1, 0.1, 0.1],
+        "custo_dos_bens": [200,200,200]
+    })
+
+    with pytest.raises(pa.errors.SchemaError):
+        MetricasFinanceirasBase.validate(df_test)
+
+def test_setor_invalido():
+    df_test = pd.DataFrame({
+        "setor_da_empresa": ["AAA_X7Y8Z9", "REP_X7Y8Z9", "MNT_4D5E6F"],
         "receita_operacional": [1000,1000,1000],
         "data": ["2023-01-01", "2023-01-01", "2023-01-01"],
         "percentual_de_imposto": [0.1, 0.1, 0.1],
