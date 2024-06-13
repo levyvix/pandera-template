@@ -1,4 +1,6 @@
-# pandera-template
+# Qualidade em Dados com Pandera
+
+Este repositório consiste na implementação de uma pipeline ETL utilizando a biblioteca Pandera para realizar a avalidação do contrato de dado em forma de Dataframe. 
 
 
 ## Pandera
