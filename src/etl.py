@@ -18,15 +18,13 @@ def transforma_dados(df: pd.DataFrame) -> pd.DataFrame:
     df_transformado["valor_do_imposto"] = df_transformado["percentual_de_imposto"] * df_transformado["receita_operacional"]
     df_transformado["custo_total"] = df_transformado["valor_do_imposto"] + df_transformado["custo_dos_bens"]
     df_transformado["receita_liquida"] = df_transformado["receita_operacional"] - df_transformado["custo_total"]
-    df_transformado["percentual_de_margem_operacional"] = (df_transformado["receita_liquida"] / df_transformado["receita_operacional"]) 
+    df_transformado["margem_operacional"] = (df_transformado["receita_liquida"] / df_transformado["receita_operacional"]) 
     df_transformado["transformado_em"] = datetime.now().strftime('%Y-%m-%d')
     return df_transformado
 
 def carrega_dados(df: pd.DataFrame) -> None:
     """Carrega os dados no Banco de Dados"""
     pass
-
-
 
 if __name__ == '__main__':
     dir_arquivo = 'data/dados_financeiros.csv'
