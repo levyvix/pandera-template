@@ -10,6 +10,8 @@ python = "3.11.5"
 pandas = "^2.2.2"
 pandera = "^0.19.3"
 pytest = "^8.2.2"
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
