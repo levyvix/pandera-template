@@ -9,9 +9,6 @@ graph TD;
     A[Extrai Dados do CSV] -->|Validação de Entrada| B[Calcula Novas Métricas]
     B -->|Validação de Saída| C[Carrega Dados no PostgreSQL]
 
-    classDef stepStyle fill:#f9f,stroke:#333,stroke-width:2px;
-    class A,B,C stepStyle;
-
 ```
 
 Adicionalmente, foram implementados testes unitários para as validações dos Schemas utilizando [pytest](https://docs.pytest.org/en/8.2.x/), integrados com uma rotina de CI utilizando GitHub Actions para todas as *pull requests*.
