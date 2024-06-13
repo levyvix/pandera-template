@@ -1,48 +1,61 @@
 # Qualidade em Dados com Pandera
 
-Este repositório consiste na implementação de uma pipeline ETL utilizando a biblioteca Pandera para realizar a avalidação do contrato de dado em forma de Dataframe. 
+Este repositório contém a implementação de uma pipeline ETL utilizando a biblioteca [Pandera](https://pandera.readthedocs.io/en/stable/) para validação de contratos de dados em forma de DataFrame.
 
+Os dados são extraídos de um arquivo CSV local, transformados e inseridos em um banco de dados PostgreSQL. Durante o processo, os dados passam por validação em duas etapas: a primeira ocorre ao serem lidos diretamente do arquivo CSV, e a segunda é realizada após a transformação dos dados.
+
+```mermaid
+graph TD;
+    A[Extrai Dados do CSV] -->|Validação de Entrada| B[Calcula Novas Métricas]
+    B -->|Validação de Saída| C[Carrega Dados no PostgreSQL]
+
+    classDef stepStyle fill:#f9f,stroke:#333,stroke-width:2px;
+    class A,B,C stepStyle;
+
+```
+
+Adicionalmente, foram implementados testes unitários para as validações dos Schemas utilizando [pytest](https://docs.pytest.org/en/8.2.x/), integrados com uma rotina de CI utilizando GitHub Actions para todas as *pull requests*.
 
 ## Pandera
 
-### Links
+> *"Data validation for scientists, engineers, and analysts seeking correctness."*
 
+#### DataFrame Models
+
+Abaixo segue um exemplo de como podemos criar um Modelo *Schema* de DataFrame, onde definimos o nosso contrato de dados.
+
+```python
+import pandera as pa
+import pandas as pd
+from pandera.typing import Series
+
+class MetricasFinanceirasBase(pa.DataFrameModel):
+    setor_da_empresa: Series[str]
+    receita_operacional: Series[float] = pa.Field(ge=0)
+    data: Series[pa.DateTime] 
+    percentual_de_imposto: Series[float] = pa.Field(in_range= {"min_value": 0, "max_value": 1})
+    custo_operacionais: Series[float] = pa.Field(ge=0)
+
+    class Config:
+        strict = True
+        coerce = True
+    
+    @pa.check(
+            "setor_da_empresa", 
+            name = "Checagem código dos setores",
+            error = "Cógido do setor da empresa é inválido")
+    def checa_codigo_setor(cls, codigo: Series[str]) -> Series[bool]:
+        return codigo.str[:4].isin(['REP_', 'MNT_', 'VND_'])
+```
 
 - [Tipos de dados](https://pandera.readthedocs.io/en/stable/reference/dtypes.html#api-dtypes)
 - [Decoradores](https://pandera.readthedocs.io/en/stable/reference/decorators.html)
 - [pa.Check](https://pandera.readthedocs.io/en/stable/reference/generated/pandera.api.checks.Check.html#pandera.api.checks.Check)
 - [pa.Field](https://pandera.readthedocs.io/en/stable/reference/generated/pandera.api.dataframe.model_components.Field.html)
 - [class Config](https://pandera.readthedocs.io/en/stable/dataframe_models.html#config)
-
-### Criando os Contratos 
- 
-#### DataFrame Schemas
-```python
-import pandera as pa
-
-from pandera import Column, DataFrameSchema, Check, Index
-
-schema = DataFrameSchema(
-    {
-        "column1": Column(int),
-        "column2": Column(float, Check(lambda s: s < -1.2)),
-        # you can provide a list of validators
-        "column3": Column(str, [
-            Check(lambda s: s.str.startswith("value")),
-            Check(lambda s: s.str.split("_", expand=True).shape[1] == 2)
-        ]),
-    },
-    index=Index(int),
-    strict=True,
-    coerce=True,
-)
-```
-
-#### DataFrame Models
-
 - [Custom Checks](https://pandera.readthedocs.io/en/stable/dataframe_models.html#custom-checks)
 
-### Aplicando as validações de Contrato
+#### Aplicando as validações de Contrato
 
 -  Com Decoradores:
 
